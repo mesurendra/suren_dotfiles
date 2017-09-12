@@ -11,11 +11,10 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'               " easy way to install plugin in vim
 Plugin 'scrooloose/nerdtree'             " File explorer
-Plugin 'Lokaltog/vim-easymotion'         " super cool plugin to naviage in the current screen
+Plugin 'Lokaltog/vim-easymotion'         " super cool plugin to navigate in the current screen
 Plugin 'tomasr/molokai'                  " My favourite theme
 Plugin 'vim-airline/vim-airline'         " Status bar at the bottom of the vim editor :)
 Plugin 'vim-airline/vim-airline-themes'
-Plugin 'kien/ctrlp.vim'                  " installed manually, quick movement, <leader><leader>w
 Plugin 'airblade/vim-gitgutter'          " shows a git diff
 Plugin 'tpope/vim-fugitive'              " git wrapper plugin
 Plugin 'freitass/todo.txt-vim'           " added manually
@@ -23,16 +22,19 @@ Plugin 'Yggdroot/indentLine'             " draw line to show indentation
 Plugin 'tpope/vim-surround'              " surround  text with some text like <h1> text </h1>
 Plugin 'scrooloose/syntastic'            " provides syntax checking for a wide array of languages
 Plugin 'ervandew/supertab'               " Autocomplete when using tab
+Plugin 'kien/ctrlp.vim'                  " installed manually, quick movement, <leader><leader>w
+Plugin 'scrooloose/nerdcommenter'        " commenting code
+Plugin 'terryma/vim-multiple-cursors'    " sublime like multi-cursor feature
 "----------------------------------------------------------------------
 "                        Experimental plugins
 "----------------------------------------------------------------------
-Plugin 'tmhedberg/SimpylFold'            " folding code
-Plugin 'scrooloose/nerdcommenter'        " commenting code
 Plugin 'SirVer/ultisnips'                " code snippet generation very handy
 Plugin 'honza/vim-snippets'
-Plugin 'terryma/vim-multiple-cursors'    " sublime like multi-cursor feature
+
 Plugin 'tpope/vim-unimpaired'            " matching  bracket highlight
 Plugin 'Valloric/YouCompleteMe'
+Plugin 'craigemery/vim-autotag'
+Plugin 'sbdchd/neoformat'
 call vundle#end()                        " required
 "======================================================================
 "                     General setting
@@ -50,7 +52,6 @@ set wildignore+=.hg,.git,.svn                    " Version control
 set wildignore+=*.aux,*.out,*.toc                " LaTeX intermediate files
 set wildignore+=*.o,*.obj,*.exe,*.dll,*.manifest " compiled object files
 set wildignore+=*.spl                            " compiled spelling word lists
-n
 set wildignore+=*.sw?                            " Vim swap files
 set wildignore+=*.DS_Store                       " OSX bullshit
 set wildignore+=*.pyc                            " Python byte code
@@ -134,6 +135,7 @@ set clipboard=unnamed,unnamedplus " to copy the yanked text  into system clipboa
 " nmap <leader>P "+P
 " vmap <leader>p "+p
 " vmap <leader>P "+P
+vmap <leader>y "*y
 
 set autoread        " Set to auto read when a file is changed from the outside
 set hidden          " Allow buffer switching without saving
@@ -142,7 +144,6 @@ set hidden          " Allow buffer switching without saving
 set history=700
 set undolevels=700
 
-set tags=./tags;/    " for ctags which makes code navigation efficient
 "======================================================================
 "                     Keyboard mapping in different modes
 "======================================================================
@@ -165,8 +166,8 @@ nnoremap <S-l> gt    " move the coursor to left tab.
 
 " Access buffer easily
 nnoremap <leader>l :ls<CR>
-nnoremap <leader>b :bp<CR>
 nnoremap <leader>f :bn<CR>
+nnoremap <leader>F :bp<CR>
 
 " Move vertically by visual line
 nnoremap j gj
@@ -197,8 +198,9 @@ vnoremap <leader>d "_d
 autocmd BufEnter * silent! lcd %:p:h
 
 " Using vim as hex editor
-nnoremap <Leader>hon :%!xxd<CR>
-nnoremap <Leader>hof :%!xxd -r<CR>
+" Don't use much so commented till i need to use it
+" nnoremap <Leader>hon :%!xxd<CR>
+" nnoremap <Leader>hof :%!xxd -r<CR>
 
 "insert  new line remaining in normal mode
 nnoremap <Leader>o o<Esc>
@@ -224,10 +226,11 @@ endif
 " Turn off search highlight
 nnoremap <silent><leader>h :nohlsearch<CR>
 
-"------------------------------ FORMATING ------------------------------
+"------------------------------ FORMATTING ------------------------------
 " Move a selected code one block left or right for indentation
 vnoremap < <gv
 vnoremap > >gv
+vnoremap <leader>a gg=G
 
 " Map sort function to a key
 vnoremap <leader>s :sort<CR>
@@ -248,42 +251,51 @@ map <leader>ss z=
 nnoremap <silent><leader>rn   :set relativenumber!<cr>
 
 " use arrow key to resize the windows
-" nnoremap <right> :vertical resize +5<cr>
-" nnoremap <left> :vertical resize -5<cr>
-" nnoremap <up> :resize +5<cr>
-" nnoremap <down> :resize -5<cr>
+nnoremap <right> :vertical resize +5<cr>
+nnoremap <left> :vertical resize -5<cr>
+nnoremap <up> :resize +5<cr>
+nnoremap <down> :resize -5<cr>
 
 "------------------------------ RUN PYTHON ----------------------------
 nnoremap <F7> <ESC>:w<CR>:!clear;python %<CR>
 nnoremap <F7> :!clear;python %<CR>
 vnoremap <F7> :!clear;python<CR>
 " will be easier for mac
-vnoremap <C-j> :!clear;python<CR>
-nnoremap <C-j> <ESC>:w<CR>:!clear;python %<CR>
+vnoremap <leader>j :!clear;python<CR>
+nnoremap <leader>j <ESC>:w<CR>:!clear;python %<CR>
 
 "------------------------------ CUSTOM FUNCTION ----------------------------
 " Better navigating through omnicomplete option list
 " See http://stackoverflow.com/questions/2170023/how-to-map-keys-for-popup-menu-in-vim
 set completeopt=longest,menuone
 function! OmniPopup(action)
-    if pumvisible()
-        if a:action == 'j'
-            return "\<C-N>"
-        elseif a:action == 'k'
-            return "\<C-P>"
-        endif
+if pumvisible()
+    if a:action == 'j'
+        return "\<C-N>"
+    elseif a:action == 'k'
+        return "\<C-P>"
     endif
-    return a:action
+endif
+return a:action
 endfunction
 
 inoremap <silent><C-j> <C-R>=OmniPopup('j')<CR>
 inoremap <silent><C-k> <C-R>=OmniPopup('k')<CR>
 
+" looks very interesting to handle multiple cursor
+nnoremap <silent> <leader>c :MultipleCursorsFind <C-R>/<CR>
+vnoremap <silent> <leader>c :MultipleCursorsFind <C-R>/<CR>
+"i use this a lot :)
+nmap <silent> <leader>k :set filetype=python<CR>
+
+noremap <silent><leader>z :enew<CR>
+
+
 " Delete trailing white space on save
 func! DeleteTrailingWS()
-  exe "normal mz"
-  %s/\s\+$//ge
-  exe "normal `z"
+exe "normal mz"
+%s/\s\+$//ge
+exe "normal `z"
 endfunc
 autocmd BufWrite * :call DeleteTrailingWS()
 "======================================================================
@@ -316,13 +328,16 @@ let g:ctrlp_dotfiles = 0               " do not show (.) dotfiles in match list
 let g:ctrlp_showhidden = 0             " do not show hidden files in match list
 let g:ctrlp_user_command = ['.git/', 'cd %s && git ls-files --exclude-standard -co'] " to make ctrlp fast "TODO: understand how?
 let g:ctrlp_custom_ignore = {
-    \ 'dir':  '\v[\/]\.(git|hg|svn|gitkeep)$',
-    \ 'file': '\v\.(exe|so|dll|log|gif|jpg|jpeg|png|psd|DS_Store|ctags|gitattributes)$',
-    \ 'link': 'some_bad_symbolic_links',
-    \ }
-nnoremap ; :CtrlPBuffer<CR>
+\ 'dir':  '\v[\/]\.(git|hg|svn|gitkeep)$',
+\ 'file': '\v\.(exe|so|dll|log|gif|jpg|jpeg|png|psd|DS_Store|ctags|gitattributes)$',
+\ 'link': 'some_bad_symbolic_links',
+\ }
 nnoremap <leader>p :CtrlP<CR>
-"------------------------------airline------------------------------
+nnoremap <leader>b :CtrlPBuffer<CR>
+nnoremap ; :CtrlPBuffer<CR>
+nnoremap <leader>m :CtrlPMRUFiles<CR>
+nnoremap <leader>. :CtrlPTag<CR>
+"-----------------------------airline------------------------------
 let g:airline_theme="powerlineish"
 "------------------------------NERDTree------------------------------
 let NERDTreeIgnore=['\.pyc$', '\~$', '\.sw?', '\.DS_Store'] "ignore files in NERDTree
@@ -331,8 +346,8 @@ let NERDTreeIgnore=['\.pyc$', '\~$', '\.sw?', '\.DS_Store'] "ignore files in NER
 set autochdir
 let g:NERDTreeChDirMode=2
 nnoremap <F4> :NERDTreeToggle<CR>  " in PC desktop i prefer this
-nnoremap <leader>nn :NERDTreeToggle<CR>
-nnoremap <leader>nf :NERDTreeFind<CR>
+nnoremap <leader>n :NERDTreeToggle<CR>
+nnoremap <leader>N :NERDTreeFind<CR>
 "------------------------------ultisnips------------------------------
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
 let g:UltiSnipsExpandTrigger="<tab>"
@@ -343,11 +358,11 @@ let g:UltiSnipsUsePythonVersion = 2
 let g:UltiSnipsEditSplit="vertical"
 
 "------------------------------SuperTab
-let g:SuperTabDefaultCompletionType    = '<C-n>'
+let g:SuperTabDefaultCompletionType    = '<C-m>'
 let g:SuperTabCrMapping                = 0
 
-  " YouCompleteMe and UltiSnips compatibility, with the helper of supertab
-let g:ycm_key_list_select_completion   = ['<C-j>', '<C-n>', '<Down>']
+" YouCompleteMe and UltiSnips compatibility, with the helper of supertab
+let g:ycm_key_list_select_completion   = ['<C-j>', '<C-m>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-k>', '<C-p>', '<Up>']
 
 let g:ycm_enable_diagnostic_highlighting = 0
@@ -357,7 +372,9 @@ let g:ycm_register_as_syntastic_checker = 0
 let g:ycm_filetype_whitelist = { 'cpp': 1, 'c': 1, 'python':1 }
 
 nnoremap <leader>g <C-]>   " goto defination using ctags
-nnoremap <leader>c <C-T>   " goto code you were working
+nnoremap <leader>G <C-T>   " goto code you were working
+
+
 "======================================================================
 "                     LANGUAGE SPECIFIC
 "======================================================================
@@ -396,7 +413,7 @@ set directory=~/.vim/swp//
 "run this once in a week :D
 nnoremap <silent><Leader>0  :!rm ~/.vim/backups/*<CR>
 " resolve Unable to open swap file warning " not required any more
-set directory=.,$TEMP
+"set directory=.,$TEMP
 
 " Use compact syntax for prettified multi-line comments
 let g:NERDCompactSexyComs = 1
@@ -406,7 +423,35 @@ let g:NERDCompactSexyComs = 1
 set nofoldenable        " when opening, files are not folded.
 set foldmethod=indent   " fold based on indent level
 set foldlevelstart=10   " open most folds by default
-set foldlevel=1
+set foldlevel=2
 set foldnestmax=10
 " Enable folding with the space bar
 nnoremap <leader>a za
+
+" create ctags
+"
+set tags=tags;
+set tags+=.tags;
+set tags+=./.git/tags;
+
+" Fugitive Shortcuts
+"""""""""""""""""""""""""""""""""""""
+nmap <silent> <leader>gs :Gstatus<cr>
+nmap <leader>ge :Gedit<cr>
+nmap <silent><leader>gr :Gread<cr>
+nmap <silent><leader>gb :Gblame<cr>
+
+let g:neoformat_run_all_formatters = 1
+
+xnoremap p pgvy
+
+
+" TODO: search in the file, buffer, folder and across repo
+"
+
+let g:SimpylFold_docstring_preview = 1
+set shortmess+=c
+
+
+nnoremap <leader>y :let g:ycm_auto_trigger=0<CR>            " turn off YCM
+nnoremap <leader>Y :let g:ycm_auto_trigger=1<CR>            " turn on YCM
