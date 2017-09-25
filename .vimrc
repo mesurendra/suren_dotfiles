@@ -35,6 +35,10 @@ Plugin 'tpope/vim-unimpaired'            " matching  bracket highlight
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'craigemery/vim-autotag'
 Plugin 'sbdchd/neoformat'
+
+" Open a shell within vim via :ConqueTerm
+Bundle "skwp/vim-conque"
+
 call vundle#end()                        " required
 "======================================================================
 "                     General setting
@@ -195,7 +199,7 @@ vnoremap <leader>d "_d
 
 "------------------------------ EDIT ------------------------------
 " Set working directory to the current file
-autocmd BufEnter * silent! lcd %:p:h
+ autocmd BufEnter * silent! lcd %:p:h
 
 " Using vim as hex editor
 " Don't use much so commented till i need to use it
@@ -217,10 +221,10 @@ vmap <M-j> :m'>+<cr>`<my`>mzgv`yo`z
 
 "move the line up or down
 if has("mac") || has("macunix")
-  nmap <D-j> <M-j>
-  nmap <D-k> <M-k>
-  vmap <D-j> <M-j>
-  vmap <D-k> <M-k>
+    nmap <D-j> <M-j>
+    nmap <D-k> <M-k>
+    vmap <D-j> <M-j>
+    vmap <D-k> <M-k>
 endif
 
 " Turn off search highlight
@@ -269,14 +273,14 @@ nnoremap <leader>j <ESC>:w<CR>:!clear;python %<CR>
 " See http://stackoverflow.com/questions/2170023/how-to-map-keys-for-popup-menu-in-vim
 set completeopt=longest,menuone
 function! OmniPopup(action)
-if pumvisible()
-    if a:action == 'j'
-        return "\<C-N>"
-    elseif a:action == 'k'
-        return "\<C-P>"
+    if pumvisible()
+        if a:action == 'j'
+            return "\<C-N>"
+        elseif a:action == 'k'
+            return "\<C-P>"
+        endif
     endif
-endif
-return a:action
+    return a:action
 endfunction
 
 inoremap <silent><C-j> <C-R>=OmniPopup('j')<CR>
@@ -293,9 +297,9 @@ noremap <silent><leader>z :enew<CR>
 
 " Delete trailing white space on save
 func! DeleteTrailingWS()
-exe "normal mz"
-%s/\s\+$//ge
-exe "normal `z"
+    exe "normal mz"
+    %s/\s\+$//ge
+    exe "normal `z"
 endfunc
 autocmd BufWrite * :call DeleteTrailingWS()
 "======================================================================
@@ -328,10 +332,10 @@ let g:ctrlp_dotfiles = 0               " do not show (.) dotfiles in match list
 let g:ctrlp_showhidden = 0             " do not show hidden files in match list
 let g:ctrlp_user_command = ['.git/', 'cd %s && git ls-files --exclude-standard -co'] " to make ctrlp fast "TODO: understand how?
 let g:ctrlp_custom_ignore = {
-\ 'dir':  '\v[\/]\.(git|hg|svn|gitkeep)$',
-\ 'file': '\v\.(exe|so|dll|log|gif|jpg|jpeg|png|psd|DS_Store|ctags|gitattributes)$',
-\ 'link': 'some_bad_symbolic_links',
-\ }
+            \ 'dir':  '\v[\/]\.(git|hg|svn|gitkeep)$',
+            \ 'file': '\v\.(exe|so|dll|log|gif|jpg|jpeg|png|psd|DS_Store|ctags|gitattributes)$',
+            \ 'link': 'some_bad_symbolic_links',
+            \ }
 nnoremap <leader>p :CtrlP<CR>
 nnoremap <leader>b :CtrlPBuffer<CR>
 nnoremap ; :CtrlPBuffer<CR>
@@ -375,6 +379,11 @@ nnoremap <leader>g <C-]>   " goto defination using ctags
 nnoremap <leader>G <C-T>   " goto code you were working
 
 
+"--------------------------------------------------ConqueTerm
+" Open Termail in a new buffer
+map <leader># <esc>:ConqueTermSplit bash<cr>
+map <leader>$ <esc>:ConqueTermVSplit bash<cr>
+
 "======================================================================
 "                     LANGUAGE SPECIFIC
 "======================================================================
@@ -401,10 +410,10 @@ au filetype python set softtabstop=4
 "set noswapfile
 "set nowritebackup
 if has('persistent_undo')
-  silent !mkdir ~/.vim/backups > /dev/null 2>&1
-  silent !mkdir ~/.vim/swp > /dev/null 2>&1
-  set undodir=~/.vim/backups
-  set undofile
+    silent !mkdir ~/.vim/backups > /dev/null 2>&1
+    silent !mkdir ~/.vim/swp > /dev/null 2>&1
+    set undodir=~/.vim/backups
+    set undofile
 endif
 
 " double // at the end handle 2 files having same name in the different location
@@ -445,13 +454,14 @@ let g:neoformat_run_all_formatters = 1
 
 xnoremap p pgvy
 
-
 " TODO: search in the file, buffer, folder and across repo
-"
 
 let g:SimpylFold_docstring_preview = 1
 set shortmess+=c
 
-
 nnoremap <leader>y :let g:ycm_auto_trigger=0<CR>            " turn off YCM
 nnoremap <leader>Y :let g:ycm_auto_trigger=1<CR>            " turn on YCM
+
+nnoremap <silent><leader>x :set foldmethod=indent<CR>
+nnoremap <silent><leader>X :set foldmethod=manual<CR>
+
