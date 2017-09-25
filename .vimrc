@@ -380,7 +380,7 @@ nnoremap <leader>G <C-T>   " goto code you were working
 
 
 "--------------------------------------------------ConqueTerm
-" Open Termail in a new buffer
+" Open Terminal in a new buffer
 map <leader># <esc>:ConqueTermSplit bash<cr>
 map <leader>$ <esc>:ConqueTermVSplit bash<cr>
 
